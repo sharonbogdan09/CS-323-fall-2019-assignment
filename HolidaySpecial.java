@@ -1,6 +1,6 @@
 /**
  * HolidaySpecial
- * Author: Your Name and Carolyn Yao
+ * Author: sharon bogdan and Carolyn Yao
  * Does this compile or finish running within 5 seconds? Y/N
  */
 
@@ -28,17 +28,52 @@ public class HolidaySpecial {
    *     cook X is assigned to step Y in an optimal schedule
    */
 
-  public int[][] makeShifts(
-    int numCooks,
-    int numSteps,
-    int[][] signUpTable
-  ) {
+  public int[][] makeShifts(int numCooks, int numSteps, int[][] signUpTable) {
     // Your scheduleTable is initialized as all 0's so far. Your code will put 1's
     // in the table in the right places based on the return description
     int[][] scheduleTable = new int[numCooks + 1][numSteps + 1];
 
     // Your code here
-
+    int k = 3; //marker initiated for 1 found with no following 1's
+    int m = 4; //marker initiated for 1 found with following 1(s)
+    int rowIncreases = 0;//counter to see what row currently on
+    int colIncreases = 0;//counter to see what col currently on
+    for (int i = 1; i <= numCooks; i++) {
+    	for (int j = 1; j <= numSteps; j++) {
+    		if (signUpTable[i][j] == 0) {//if current index is 0
+    		    if (i == numCooks && scheduleTable[i][j] == 3) { //bound reached and no other 1 found use marked
+    		    	scheduleTable[i][j] = 1; // this changes the first marker to a 1 b/c none have a consecutive 1 
+    		    	k = 3;
+    		   	}//if marker k
+    		    else i++;// increases if 0
+    		    rowIncreases = rowIncreases + 1;//the row number increases to keep track of where we are
+    		}// if [i][j] == 0
+    		if (signUpTable[i][j] == 1) {//if current index is 1
+    			if (signUpTable[i][j+1] == 0) {//if next index of row is 0 then mark that 1 was found
+    				scheduleTable[i][j] = k; // mark 1 was found but continue checking
+    				k = k + 1; //increase marker so if bound reached and no other 1 found make the first marker a 1
+    				i++;//increase row to see if another 1 is found
+    				if (i == numCooks && signUpTable[i][j] == 1) {//if at row bound and last element is a 1 
+    					scheduleTable[i][j] = 1; //then make this index 1 b/c none of preceding had consecutive 1's
+    				}//if bound reached and is 1
+    			}// if [i][j+1] == 0
+    			else {
+    				scheduleTable[i][j] = m;//mark consec. 1s found
+    				j++;// inc col
+    				colIncreases = colIncreases + 1;// increase col count to keep track
+    			}//else
+    			m++;//increase marker for 1 found with 1(s) following
+    			i++;//if following column index is 1, then increase row to check for another index with consec. 1's
+    			if (i == numCooks && signUpTable[i][j] == 0) {
+    				i = 1 + rowIncreases;
+    				rowIncreases = 0; //reset number of row increases b/c new col
+    				j = j - colIncreases;
+    				colIncreases = 0;// reset number of col increases b/c new row
+    				
+    				}//if numCooks
+    		}// if [i][j] == 1
+    	}//for j
+    }//for i
     return scheduleTable;
   }
 
